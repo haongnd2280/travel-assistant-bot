@@ -1,0 +1,15 @@
+*/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg/
+*.whl/
+*.dist-info/
+.vscode/
+
+# Environment variables file
+.env
+
+# db files
+*.sqlite

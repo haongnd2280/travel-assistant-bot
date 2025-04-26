@@ -1,0 +1,32 @@
+[project]
+name = "travel-assistant-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "haongnd" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-community>=0.3.22",
+    "langchain-core>=0.3.55",
+    "langchain-openai>=0.3.14",
+    "langgraph>=0.3.31",
+    "numpy>=2.2.5",
+    "openai>=1.75.0",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+]
+
+[project.scripts]
+travel-assistant-bot = "travel_assistant_bot:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "ipython>=9.1.0",
+]
