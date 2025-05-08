@@ -3,7 +3,7 @@ from langgraph.graph import END, StateGraph, START
 from langgraph.prebuilt import tools_condition
 
 from travel_assistant_bot.state import State
-from travel_assistant_bot.agent import assistant, part_1_tools
+from travel_assistant_bot.agent import assistant, tools
 from tools.utils import create_tool_node_with_fallback
 
 
@@ -12,7 +12,7 @@ builder = StateGraph(State)
 
 # Define nodes: these do the work
 builder.add_node("assistant", assistant)
-builder.add_node("tools", create_tool_node_with_fallback(part_1_tools))
+builder.add_node("tools", create_tool_node_with_fallback(tools))
 
 # Define edges: these determine how the control flow moves
 builder.add_edge(START, "assistant")

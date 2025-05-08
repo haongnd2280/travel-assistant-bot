@@ -82,7 +82,7 @@ class Assistant:
 
 llm = ChatOpenAI(model="gpt-4.1", temperature=0)
 
-primary_assistant_prompt = ChatPromptTemplate.from_messages(
+assistant_prompt = ChatPromptTemplate.from_messages(
     [
         (
             # System message
@@ -99,7 +99,7 @@ primary_assistant_prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(time=datetime.now)
 
-part_1_tools = [
+tools = [
     TavilySearchResults(max_results=1),
     fetch_user_flight_information,
     search_flights,
@@ -120,5 +120,5 @@ part_1_tools = [
     cancel_excursion,
 ]
 # Runnable = System Message + Message List ---> LLM + Tools
-runnable = primary_assistant_prompt | llm.bind_tools(part_1_tools)
+runnable = assistant_prompt | llm.bind_tools(tools)
 assistant = Assistant(runnable)

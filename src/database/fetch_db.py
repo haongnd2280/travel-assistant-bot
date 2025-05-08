@@ -1,14 +1,21 @@
 import os
+import shutil
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
 import requests
 
 
+db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
+db_file = Path(__file__).resolve().parent / "travel2.sqlite"
+backup_file = Path(__file__).resolve().parent / "travel2.backup.sqlite"
+
 def download_db_file(
-    db_url: str,
+    db_url: str = db_url,
     overwrite: bool = False,
-    save_file: str = "travel2.sqlite",
+    save_file: str = db_file,
+    backup_file: str = backup_file,
 ) -> None:
     # The backup lets us restart for each tutorial section
     if not os.path.exists(save_file) or overwrite:
@@ -19,21 +26,25 @@ def download_db_file(
         with open(save_file, "wb") as f:
             f.write(response.content)
 
+        # The backup file should be created
+        # the first time the database is downloaded
+        shutil.copy(save_file, backup_file)
+
         print("Database downloaded successfully.")
     else:
         print("Database already downloaded.")
 
 
-def update_dates(fb_file: str) -> None:
+def update_dates(db_file: str) -> None:
     # Convert the flights to present time for our tutorial
-    # We will use the backup file to update dates for the main db file
 
-    download_db_file(
-        db_url,
-        save_file=fb_file,
-    )
+    download_db_file(save_file=db_file)
 
-    conn = sqlite3.connect(fb_file)
+    # We will use the backup file to reset the db in each section
+    shutil.copy(backup_file, db_file)
+
+    print("Updating dates in the database...")
+    conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
     # Get the list of tables (`name` column)
@@ -48,8 +59,8 @@ def update_dates(fb_file: str) -> None:
 
     # Reads each table into a pandas DataFrame and stores in a dict
     dbs = {}
-    for tb in tables:
-        dbs[tb] = pd.read_sql(f"SELECT * from {tb}", conn)
+    for table in tables:
+        dbs[table] = pd.read_sql(f"SELECT * from {table}", conn)
 
     # Timestamp: Book date -> Schedule departure -> Actual departure -> Now
 
@@ -99,9 +110,4 @@ def update_dates(fb_file: str) -> None:
     conn.commit()
     conn.close()
 
-
-# ---------------------------------------
-from pathlib import Path
-
-db_url = "https://storage.googleapis.com/benchmarks-artifacts/travel-db/travel2.sqlite"
-db_file = Path(__file__).resolve().parent / "travel2.sqlite"
+    print("Database updated successfully.")
