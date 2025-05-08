@@ -41,28 +41,18 @@ class Assistant:
         self.runnable = runnable
 
     def __call__(self, state: State, config: RunnableConfig) -> State:
+        # NOTE: Retain `config` to automatically pass it to Runnable's `invoke` method
         while True:
-            configuration = config.get("configurable", {})
-            passenger_id = configuration.get("passenger_id", None)
-            # Create a new state instead of modifying the existing one
-            # This is to avoid mutability issues
-            state = {
-                **state,
-                "user_info": passenger_id
-            }
-
             result = self.runnable.invoke(state)
             # If the LLM happens to return an empty response, we will re-prompt it
             # for an actual response.
             if (
-                not result.tool_calls   # no tool calls
-                and                     # no content
+                not result.tool_calls and   # no tool calls                     # no content
                 (
-                    not result.content
-                    or
+                    not result.content or
                     (
-                        isinstance(result.content, list)
-                        and not result.content[0].get("text")
+                        isinstance(result.content, list) and
+                        not result.content[0].get("text")
                     )
                 )
             ):
